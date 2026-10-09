@@ -6,6 +6,8 @@ import 'package:walang_signal/app/home_tabs.dart';
 import 'package:walang_signal/features/chat/domain/gemma_chat_backend.dart';
 import 'package:walang_signal/features/locations/domain/aid_facility.dart';
 import 'package:walang_signal/features/locations/domain/nearby_aid_finder.dart';
+import 'package:walang_signal/features/knowledge/domain/knowledge_base.dart';
+import 'package:walang_signal/features/knowledge/domain/retrieved_passage.dart';
 import 'package:walang_signal/features/speech/domain/speech_test_backend.dart';
 
 void main() {
@@ -16,6 +18,7 @@ void main() {
           chatBackend: _FakeChatBackend(),
           speechBackend: _FakeSpeechBackend(),
           nearbyAidFinder: _FakeNearbyAidFinder(),
+          knowledgeBase: _FakeKnowledgeBase(),
         ),
       ),
     );
@@ -108,4 +111,24 @@ class _FakeNearbyAidFinder implements NearbyAidFinder {
     ),
     facilities: const [],
   );
+}
+
+class _FakeKnowledgeBase implements LocalKnowledgeBase {
+  @override
+  bool get isReady => false;
+
+  @override
+  Future<bool> restoreIfAvailable() async => false;
+
+  @override
+  Future<void> installAndIndex({
+    required String accessToken,
+    required void Function(KnowledgeBaseProgress progress) onProgress,
+  }) async {}
+
+  @override
+  Future<List<RetrievedPassage>> retrieve(String query) async => const [];
+
+  @override
+  Future<void> dispose() async {}
 }

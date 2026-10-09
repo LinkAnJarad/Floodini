@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../features/chat/domain/gemma_chat_backend.dart';
 import '../features/chat/presentation/gemma_chat_screen.dart';
 import '../features/locations/domain/nearby_aid_finder.dart';
+import '../features/knowledge/domain/knowledge_base.dart';
 import '../features/locations/presentation/nearby_aid_screen.dart';
 import '../features/speech/domain/speech_test_backend.dart';
 import '../features/speech/presentation/speech_test_screen.dart';
@@ -13,11 +14,13 @@ class WalangSignalHome extends StatelessWidget {
     required this.chatBackend,
     required this.speechBackend,
     required this.nearbyAidFinder,
+    required this.knowledgeBase,
   });
 
   final GemmaChatBackend chatBackend;
   final SpeechTestBackend speechBackend;
   final NearbyAidFinder nearbyAidFinder;
+  final LocalKnowledgeBase knowledgeBase;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +39,11 @@ class WalangSignalHome extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            GemmaChatScreen(backend: chatBackend, showAppBar: false),
+            GemmaChatScreen(
+              backend: chatBackend,
+              knowledgeBase: knowledgeBase,
+              showAppBar: false,
+            ),
             SpeechTestScreen(backend: speechBackend, showAppBar: false),
             NearbyAidScreen(finder: nearbyAidFinder, showAppBar: false),
           ],

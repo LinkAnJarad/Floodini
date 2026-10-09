@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:walang_signal/features/chat/domain/chat_image_picker.dart';
 import 'package:walang_signal/features/chat/domain/gemma_chat_backend.dart';
 import 'package:walang_signal/features/chat/presentation/gemma_chat_screen.dart';
+import 'package:walang_signal/features/knowledge/domain/knowledge_base.dart';
+import 'package:walang_signal/features/knowledge/domain/retrieved_passage.dart';
 
 void main() {
   testWidgets('installs Gemma 4 E2B before enabling chat', (tester) async {
@@ -146,6 +148,42 @@ void main() {
     expect(backend.sentPrompts.last, 'Describe this photo.');
     expect(backend.sentImages.last, same(photoBytes));
   });
+
+  testWidgets('retrieves for each query and gives relevant passages to Gemma', (
+    tester,
+  ) async {
+    final knowledgeBase = _FakeKnowledgeBase(
+      passages: const [
+        RetrievedPassage(
+          id: 'pagasa::1',
+          content: 'Move to a safe area before water cuts off access.',
+          title: 'PAGASA Flood Guide',
+          sectionPath: 'What to do when water is rising',
+          similarity: 0.82,
+        ),
+      ],
+    );
+    final backend = _FakeGemmaChatBackend(installed: true);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: GemmaChatScreen(backend: backend, knowledgeBase: knowledgeBase),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('chat-input')),
+      'Water is rising',
+    );
+    await tester.tap(find.byKey(const Key('send-button')));
+    await tester.pumpAndSettle();
+
+    expect(knowledgeBase.queries, ['Water is rising']);
+    expect(backend.sentPrompts.single, contains('Move to a safe area'));
+    expect(backend.sentPrompts.single, contains('Water is rising'));
+    expect(find.text('Water is rising'), findsOneWidget);
+  });
 }
 
 class _FakeGemmaChatBackend implements GemmaChatBackend {
@@ -197,4 +235,32 @@ class _FakeChatImagePicker implements ChatImagePicker {
     requestedSources.add(fromCamera);
     return imageBytes;
   }
+}
+
+class _FakeKnowledgeBase implements LocalKnowledgeBase {
+  _FakeKnowledgeBase({required this.passages});
+
+  final List<RetrievedPassage> passages;
+  final List<String> queries = [];
+
+  @override
+  bool get isReady => true;
+
+  @override
+  Future<bool> restoreIfAvailable() async => true;
+
+  @override
+  Future<void> installAndIndex({
+    required String accessToken,
+    required void Function(KnowledgeBaseProgress progress) onProgress,
+  }) async {}
+
+  @override
+  Future<List<RetrievedPassage>> retrieve(String query) async {
+    queries.add(query);
+    return passages;
+  }
+
+  @override
+  Future<void> dispose() async {}
 }

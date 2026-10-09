@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../features/chat/domain/gemma_chat_backend.dart';
 import '../features/locations/domain/nearby_aid_finder.dart';
+import '../features/knowledge/domain/knowledge_base.dart';
 import '../features/speech/domain/speech_test_backend.dart';
 import 'home_tabs.dart';
 
@@ -11,12 +12,14 @@ class WalangSignalApp extends StatelessWidget {
     required this.chatBackend,
     required this.speechBackend,
     required this.nearbyAidFinder,
+    required this.knowledgeBase,
     this.initializationError,
   });
 
   final GemmaChatBackend chatBackend;
   final SpeechTestBackend speechBackend;
   final NearbyAidFinder nearbyAidFinder;
+  final LocalKnowledgeBase knowledgeBase;
   final String? initializationError;
 
   @override
@@ -29,6 +32,7 @@ class WalangSignalApp extends StatelessWidget {
               chatBackend: chatBackend,
               speechBackend: speechBackend,
               nearbyAidFinder: nearbyAidFinder,
+              knowledgeBase: knowledgeBase,
             )
           : _InitializationErrorScreen(error: initializationError!),
     );
