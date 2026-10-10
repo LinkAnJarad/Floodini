@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:walang_signal/features/locations/data/overpass_geojson_repository.dart';
-import 'package:walang_signal/features/locations/domain/aid_facility.dart';
+import 'package:floodini/features/locations/data/overpass_geojson_repository.dart';
+import 'package:floodini/features/locations/domain/aid_facility.dart';
 
 const _fixture = '''
 {

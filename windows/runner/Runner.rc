@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "walang_signal" "\0"
+            VALUE "FileDescription", "floodini" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "walang_signal" "\0"
+            VALUE "InternalName", "floodini" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "walang_signal.exe" "\0"
-            VALUE "ProductName", "walang_signal" "\0"
+            VALUE "OriginalFilename", "floodini.exe" "\0"
+            VALUE "ProductName", "floodini" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

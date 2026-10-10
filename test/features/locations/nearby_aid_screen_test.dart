@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:walang_signal/features/locations/domain/aid_facility.dart';
-import 'package:walang_signal/features/locations/domain/nearby_aid_finder.dart';
-import 'package:walang_signal/features/locations/presentation/nearby_aid_screen.dart';
+import 'package:floodini/features/locations/domain/aid_facility.dart';
+import 'package:floodini/features/locations/domain/directions_launcher.dart';
+import 'package:floodini/features/locations/domain/nearby_aid_finder.dart';
+import 'package:floodini/features/locations/presentation/nearby_aid_screen.dart';
 
 void main() {
   testWidgets(
     'shows nearby facility results after an explicit location search',
     (tester) async {
       final finder = _FakeNearbyAidFinder();
+      tester.view.physicalSize = const Size(800, 3200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
       await tester.pumpWidget(
         MaterialApp(home: NearbyAidScreen(finder: finder)),
       );
@@ -23,6 +27,76 @@ void main() {
       expect(find.text('OpenStreetMap contributors · ODbL'), findsOneWidget);
     },
   );
+
+  testWidgets('opens walking directions when a result is tapped', (
+    tester,
+  ) async {
+    final launcher = _FakeDirectionsLauncher();
+    tester.view.physicalSize = const Size(800, 3200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: NearbyAidScreen(
+          finder: _FakeNearbyAidFinder(),
+          directions: launcher,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('find-nearby-button')));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.byKey(const Key('facility-node/123')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('facility-node/123')));
+    await tester.pumpAndSettle();
+
+    expect(launcher.opened.single.$1.latitude, 14.66);
+    expect(launcher.opened.single.$2, 'Marikina City Health Center');
+  });
+
+  testWidgets('tells the user when no maps app could be opened', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 3200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: NearbyAidScreen(
+          finder: _FakeNearbyAidFinder(),
+          directions: _FakeDirectionsLauncher(succeeds: false),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('find-nearby-button')));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.byKey(const Key('facility-node/123')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('facility-node/123')));
+    await tester.pump();
+
+    expect(find.text('Could not open a maps app.'), findsOneWidget);
+  });
+}
+
+class _FakeDirectionsLauncher implements DirectionsLauncher {
+  _FakeDirectionsLauncher({this.succeeds = true});
+
+  final bool succeeds;
+  final opened = <(GeoPoint, String)>[];
+
+  @override
+  Future<bool> openWalkingDirections({
+    required GeoPoint destination,
+    required String label,
+  }) async {
+    opened.add((destination, label));
+    return succeeds;
+  }
 }
 
 class _FakeNearbyAidFinder implements NearbyAidFinder {

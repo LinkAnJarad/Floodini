@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:walang_signal/features/knowledge/domain/markdown_knowledge_chunker.dart';
+import 'package:floodini/features/knowledge/domain/markdown_knowledge_chunker.dart';
 
 void main() {
   test('keeps heading paths and source metadata on evidence chunks', () {

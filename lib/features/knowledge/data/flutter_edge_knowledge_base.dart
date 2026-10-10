@@ -18,18 +18,17 @@ class FlutterEdgeKnowledgeBase implements LocalKnowledgeBase {
     this.chunker = const MarkdownKnowledgeChunker(),
   }) : _bundle = bundle ?? rootBundle;
 
+  // Gecko-110m-en: Apache-2.0 and ungated, so no Hugging Face token is needed.
   static const embeddingProfileId =
-      'embeddinggemma-300m-seq256-mp-rev-29888fcee321-'
-      'retrieval-prefix-meanpool-l2-v1';
-  static const modelFileName =
-      'embeddinggemma-300M_seq256_mixed-precision-29888fcee321.tflite';
+      'gecko-110m-en-seq256-quant-rev-61a0d0c2-v1';
+  static const modelFileName = 'Gecko_256_quant-61a0d0c2.tflite';
   static const modelUrl =
-      'https://huggingface.co/litert-community/embeddinggemma-300m/'
-      'resolve/29888fcee3216acadc7e844906e5fe0d79a61875/'
-      'embeddinggemma-300M_seq256_mixed-precision.tflite';
+      'https://huggingface.co/litert-community/Gecko-110m-en/'
+      'resolve/61a0d0c2cdc9b4f2c1727e63acb7ad86e68508c2/'
+      'Gecko_256_quant.tflite';
   static const tokenizerUrl =
-      'https://huggingface.co/litert-community/embeddinggemma-300m/'
-      'resolve/29888fcee3216acadc7e844906e5fe0d79a61875/'
+      'https://huggingface.co/litert-community/Gecko-110m-en/'
+      'resolve/61a0d0c2cdc9b4f2c1727e63acb7ad86e68508c2/'
       'sentencepiece.model';
 
   static const retrievalThreshold = 0.35;
@@ -71,39 +70,26 @@ class FlutterEdgeKnowledgeBase implements LocalKnowledgeBase {
 
   @override
   Future<void> installAndIndex({
-    required String accessToken,
     required void Function(KnowledgeBaseProgress progress) onProgress,
   }) {
     final existing = _preparing;
     if (existing != null) return existing;
-    final future = _installAndIndex(
-      accessToken: accessToken.trim(),
-      onProgress: onProgress,
-    );
+    final future = _installAndIndex(onProgress: onProgress);
     _preparing = future;
     return future.whenComplete(() => _preparing = null);
   }
 
   Future<void> _installAndIndex({
-    required String accessToken,
     required void Function(KnowledgeBaseProgress progress) onProgress,
   }) async {
     _ready = false;
-    if (accessToken.isEmpty && FlutterEdgeAi.activeEmbedderSpec == null) {
-      throw StateError(
-        'EmbeddingGemma needs a Hugging Face read token the first time it is '
-        'downloaded. Accept the Gemma model terms, then enter the token here.',
-      );
-    }
-
-    final token = accessToken.isEmpty ? null : accessToken;
     await FlutterEdgeAi.installEmbedder()
-        .modelFromNetwork(modelUrl, token: token, filename: modelFileName)
-        .tokenizerFromNetwork(tokenizerUrl, token: token)
+        .modelFromNetwork(modelUrl, filename: modelFileName)
+        .tokenizerFromNetwork(tokenizerUrl)
         .withModelProgress(
           (percent) => onProgress(
             KnowledgeBaseProgress(
-              message: 'Downloading EmbeddingGemma',
+              message: 'Downloading embedding model',
               percent: percent,
             ),
           ),
@@ -111,7 +97,7 @@ class FlutterEdgeKnowledgeBase implements LocalKnowledgeBase {
         .withTokenizerProgress(
           (percent) => onProgress(
             KnowledgeBaseProgress(
-              message: 'Downloading EmbeddingGemma tokenizer',
+              message: 'Downloading embedding tokenizer',
               percent: percent,
             ),
           ),
@@ -189,7 +175,7 @@ class FlutterEdgeKnowledgeBase implements LocalKnowledgeBase {
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final location = p.join(
       documentsDirectory.path,
-      'walang_signal_knowledge_embeddinggemma_seq256_v1.sqlite',
+      'floodini_knowledge_gecko_seq256_v1.sqlite',
     );
     final index = await _rag.open(
       spec: VectorStoreSpec(providerId: 'sqlite', location: location),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter_edge_ai/flutter_edge_ai.dart';
@@ -22,6 +23,13 @@ class DeviceSpeechTestBackend implements SpeechTestBackend {
   Map<String, String>? _filipinoVoice;
   bool _isRecording = false;
   Object? _recordingError;
+  double _levelDb = -100;
+  Completer<void>? _listening;
+  bool _listenCancelled = false;
+
+  // ponytail: fixed dBFS gate for speech vs. room noise; make it adaptive
+  // (track the noise floor) if it misfires on noisy phones.
+  static const speechThresholdDb = -38.0;
 
   @override
   Future<bool> isWhisperInstalled() async =>
@@ -51,8 +59,7 @@ class DeviceSpeechTestBackend implements SpeechTestBackend {
         .install();
   }
 
-  @override
-  Future<void> startRecording() async {
+  Future<void> _startRecording() async {
     if (_isRecording) return;
     if (!await _recorder.hasPermission()) {
       throw StateError('Microphone permission was not granted.');
@@ -68,14 +75,13 @@ class DeviceSpeechTestBackend implements SpeechTestBackend {
       ),
     );
     _recordingSubscription = stream.listen(
-      _audio.add,
+      _onAudioChunk,
       onError: (Object error) => _recordingError = error,
     );
     _isRecording = true;
   }
 
-  @override
-  Future<String> stopAndTranscribe() async {
+  Future<String> _stopAndTranscribe() async {
     if (!_isRecording) {
       throw StateError('Start a recording before transcribing.');
     }
@@ -97,6 +103,84 @@ class DeviceSpeechTestBackend implements SpeechTestBackend {
     }
     _recognizer ??= await FlutterEdgeAi.getActiveStt(language: 'tl');
     return _recognizer!.transcribe(pcm, language: 'tl');
+  }
+
+  void _onAudioChunk(Uint8List chunk) {
+    _audio.add(chunk);
+    final bytes = chunk.offsetInBytes.isEven
+        ? chunk
+        : Uint8List.fromList(chunk);
+    final samples = bytes.buffer.asInt16List(
+      bytes.offsetInBytes,
+      bytes.lengthInBytes ~/ 2,
+    );
+    if (samples.isEmpty) return;
+    var sum = 0.0;
+    for (final sample in samples) {
+      sum += sample * sample;
+    }
+    final rms = math.sqrt(sum / samples.length) / 32768;
+    _levelDb = rms <= 0 ? -100 : 20 * math.log(rms) / math.ln10;
+  }
+
+  @override
+  Future<String> listen({
+    Duration maxDuration = const Duration(seconds: 28),
+    Duration silenceAfterSpeech = const Duration(milliseconds: 1500),
+    Duration waitForSpeech = const Duration(seconds: 8),
+  }) async {
+    if (_listening != null) return '';
+    _listenCancelled = false;
+    final done = _listening = Completer<void>();
+    _levelDb = -100;
+    try {
+      await _startRecording();
+      final clock = Stopwatch()..start();
+      var heardSpeech = false;
+      var lastLoud = Duration.zero;
+      while (!done.isCompleted) {
+        await Future.any([
+          Future<void>.delayed(const Duration(milliseconds: 100)),
+          done.future,
+        ]);
+        final now = clock.elapsed;
+        if (_levelDb > speechThresholdDb) {
+          heardSpeech = true;
+          lastLoud = now;
+        }
+        if (now >= maxDuration ||
+            (heardSpeech && now - lastLoud >= silenceAfterSpeech) ||
+            (!heardSpeech && now >= waitForSpeech)) {
+          break;
+        }
+      }
+      if (_listenCancelled || !heardSpeech) {
+        await _discardRecording();
+        return '';
+      }
+      return await _stopAndTranscribe();
+    } catch (_) {
+      await _discardRecording();
+      rethrow;
+    } finally {
+      _listening = null;
+    }
+  }
+
+  @override
+  Future<void> cancelListening() async {
+    _listenCancelled = true;
+    final done = _listening;
+    if (done != null && !done.isCompleted) done.complete();
+  }
+
+  Future<void> _discardRecording() async {
+    if (!_isRecording) return;
+    await _recorder.stop();
+    await _recordingSubscription?.cancel();
+    _recordingSubscription = null;
+    _isRecording = false;
+    _audio.clear();
   }
 
   @override
@@ -137,6 +221,11 @@ class DeviceSpeechTestBackend implements SpeechTestBackend {
     }
   }
 
+  Future<Map<String, String>?> _findFilipinoVoiceOrNull() async {
+    final status = await checkFilipinoVoice();
+    return status.canSpeak ? _filipinoVoice : null;
+  }
+
   static bool _isFilipinoLocale(String locale) {
     final language = locale.toLowerCase().replaceAll('_', '-').split('-').first;
     return language == 'fil' || language == 'tl';
@@ -155,14 +244,10 @@ class DeviceSpeechTestBackend implements SpeechTestBackend {
       );
 
   @override
-  Future<void> speakFilipino(String text) async {
+  Future<void> speak(String text) async {
+    _filipinoVoice ??= await _findFilipinoVoiceOrNull();
     final voice = _filipinoVoice;
-    if (voice == null) {
-      throw StateError(
-        'Check for an installed Filipino voice before speaking.',
-      );
-    }
-    await _tts.setVoice(voice);
+    if (voice != null) await _tts.setVoice(voice);
     await _tts.setSpeechRate(0.48);
     await _tts.awaitSpeakCompletion(true);
     await _tts.speak(text);
@@ -175,6 +260,7 @@ class DeviceSpeechTestBackend implements SpeechTestBackend {
 
   @override
   Future<void> dispose() async {
+    await cancelListening();
     if (_isRecording) await _recorder.stop();
     await _recordingSubscription?.cancel();
     await _recognizer?.close();

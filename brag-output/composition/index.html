@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Floodini</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Inter";
+        font-weight: 400;
+        src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "Inter";
+        font-weight: 600;
+        src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "Inter";
+        font-weight: 700;
+        src: url("assets/fonts/inter-latin-700-normal.woff2") format("woff2");
+      }
+
+      :root {
+        --teal: #0f4c5c;
+        --blue: #168aad;
+        --cyan: #25c9d5;
+        --carbon: #12181b;
+        --surface: #f7f9fa;
+        --cream: #f7eed1;
+        --red: #d62828;
+        --amber: #f5a623;
+        --green: #2e9e6b;
+        --outline: #bec8ce;
+        --muted: #3e484d;
+        --primary-container: #bbe9ff;
+        --secondary-container: #b3e8fb;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--cream);
+        font-family: "Inter", sans-serif;
+        color: var(--carbon);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      .clip {
+        position: absolute;
+        inset: 0;
+      }
+      svg.i {
+        width: 1em;
+        height: 1em;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex: none;
+      }
+
+      /* ---------- backgrounds ---------- */
+      #bg-cream,
+      #bg-light {
+        position: absolute;
+        inset: 0;
+      }
+      #bg-cream {
+        background: var(--cream);
+      }
+      #bg-light {
+        background: linear-gradient(135deg, #e6f4f8 0%, #f7f9fa 55%, #eef7f6 100%);
+        clip-path: inset(0 0 0 100%);
+      }
+      #bg-orb {
+        position: absolute;
+        left: 1130px;
+        top: 150px;
+        width: 560px;
+        height: 560px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(37, 201, 213, 0.22), rgba(37, 201, 213, 0) 68%);
+      }
+
+      /* ---------- hook / outro ---------- */
+      .center-stack {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .glow {
+        position: absolute;
+        width: 620px;
+        height: 620px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(37, 201, 213, 0.35), rgba(37, 201, 213, 0) 68%);
+      }
+      .mascot {
+        position: relative;
+        width: 344px;
+        height: 404px;
+        image-rendering: pixelated;
+        display: block;
+      }
+      .wordmark {
+        font-size: 132px;
+        line-height: 1.05;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--teal);
+        margin-top: 24px;
+      }
+      .tagline {
+        font-size: 50px;
+        font-weight: 600;
+        color: var(--teal);
+        margin-top: 8px;
+      }
+      .built {
+        font-size: 36px;
+        font-weight: 600;
+        color: var(--muted);
+        margin-top: 26px;
+      }
+      .disclaimer {
+        font-size: 30px;
+        font-weight: 400;
+        color: var(--muted);
+        margin-top: 10px;
+      }
+
+      /* ---------- feature cards (left) ---------- */
+      .fcard {
+        position: absolute;
+        left: 140px;
+        top: 300px;
+        width: 880px;
+      }
+      .fcard-inner {
+        background: #fff;
+        border: 1px solid rgba(18, 24, 27, 0.08);
+        border-radius: 32px;
+        box-shadow: 0 8px 32px rgba(15, 76, 92, 0.1);
+        padding: 56px 64px 60px;
+      }
+      .ftile {
+        width: 96px;
+        height: 96px;
+        border-radius: 28px;
+        background: var(--primary-container);
+        color: var(--teal);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 52px;
+      }
+      .ftitle {
+        font-size: 84px;
+        line-height: 1.08;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--teal);
+        margin-top: 32px;
+      }
+      .fline {
+        text-wrap: balance;
+        font-size: 38px;
+        line-height: 1.3;
+        font-weight: 600;
+        color: var(--muted);
+        margin-top: 18px;
+      }
+      .fline:first-of-type {
+        margin-top: 22px;
+      }
+
+      /* ---------- phone ---------- */
+      #phone-pos {
+        position: absolute;
+        left: 1190px;
+        top: 62px;
+        width: 457px;
+        height: 956px;
+      }
+      #phone-frame {
+        width: 457px;
+        height: 956px;
+        border-radius: 60px;
+        background: #101517;
+        padding: 14px;
+        box-shadow: 0 30px 60px rgba(15, 76, 92, 0.28);
+      }
+      #phone-screen {
+        width: 429px;
+        height: 928px;
+        border-radius: 46px;
+        overflow: hidden;
+        background: var(--surface);
+      }
+      #ui {
+        width: 390px;
+        height: 844px;
+        transform: scale(1.1);
+        transform-origin: top left;
+        position: relative;
+        font-size: 14px;
+      }
+      .status {
+        height: 28px;
+        background: var(--teal);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 22px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .status-r {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #nosvc {
+        font-size: 11px;
+        font-weight: 600;
+        opacity: 0.9;
+      }
+      .bars {
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        gap: 2px;
+        height: 14px;
+      }
+      .bars i {
+        width: 3px;
+        background: #fff;
+        border-radius: 1px;
+        opacity: 0.35;
+      }
+      .bars i:nth-child(1) { height: 4px; }
+      .bars i:nth-child(2) { height: 7px; }
+      .bars i:nth-child(3) { height: 10px; }
+      .bars i:nth-child(4) { height: 14px; }
+      #slash {
+        position: absolute;
+        left: -2px;
+        top: 6px;
+        width: 20px;
+        height: 2px;
+        background: #ffb4ab;
+        transform: rotate(-35deg);
+      }
+      .batt {
+        width: 22px;
+        height: 11px;
+        border: 1.5px solid #fff;
+        border-radius: 3px;
+        position: relative;
+      }
+      .batt::after {
+        content: "";
+        position: absolute;
+        inset: 1.5px;
+        right: 5px;
+        background: #fff;
+        border-radius: 1px;
+      }
+      .header {
+        height: 64px;
+        background: var(--teal);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #fff;
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-container);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .avatar img {
+        height: 34px;
+        image-rendering: pixelated;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 28px;
+        padding: 0 11px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .chip.safe {
+        background: #dff5ea;
+        color: #14573a;
+        border: 1px solid rgba(46, 158, 107, 0.6);
+      }
+      .chip.warn {
+        background: #fff1d6;
+        color: #6b4300;
+        border: 1px solid rgba(245, 166, 35, 0.7);
+      }
+      .chip.neutral {
+        background: #e3e9ed;
+        color: var(--muted);
+        border: 1px solid #bec8ce;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+      .body {
+        position: relative;
+        height: 680px;
+        overflow: hidden;
+        background: var(--surface);
+      }
+      .screen {
+        position: absolute;
+        inset: 0;
+        padding: 14px 16px 0;
+      }
+      .nav {
+        position: relative;
+        height: 72px;
+        background: #fff;
+        border-top: 1px solid var(--outline);
+        display: flex;
+      }
+      .nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        position: relative;
+        z-index: 1;
+      }
+      .nav-item svg.i {
+        font-size: 24px;
+      }
+      #nav-ind {
+        position: absolute;
+        left: 33px;
+        top: 9px;
+        width: 64px;
+        height: 32px;
+        border-radius: 16px;
+        background: var(--primary-container);
+      }
+      .nav-item.on {
+        color: var(--teal);
+      }
+
+      /* chat */
+      .chips-row {
+        display: flex;
+        gap: 8px;
+      }
+      #chat-empty {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        top: 62px;
+        text-align: center;
+      }
+      #chat-empty img {
+        height: 104px;
+        image-rendering: pixelated;
+      }
+      #chat-empty h3 {
+        font-size: 21px;
+        font-weight: 700;
+        margin-top: 8px;
+      }
+      #chat-empty p {
+        font-size: 14px;
+        margin-top: 4px;
+        color: var(--muted);
+      }
+      .tiles-label {
+        text-align: left;
+        font-size: 13px;
+        font-weight: 600;
+        margin: 16px 0 8px;
+      }
+      .tiles {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .tile {
+        height: 54px;
+        background: #fff;
+        border: 1px solid rgba(18, 24, 27, 0.1);
+        border-radius: 14px;
+        box-shadow: 0 2px 8px rgba(15, 76, 92, 0.06);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 12px;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: left;
+        color: var(--carbon);
+      }
+      .tile svg.i {
+        font-size: 20px;
+        color: var(--blue);
+      }
+      #chat-convo {
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        top: 56px;
+      }
+      .bubble {
+        border-radius: 16px;
+        padding: 11px 14px;
+        font-size: 15px;
+        line-height: 1.45;
+      }
+      .bubble.u {
+        background: var(--primary-container);
+        color: #001f29;
+        margin-left: 54px;
+        border-bottom-right-radius: 4px;
+      }
+      .arow {
+        display: flex;
+        gap: 8px;
+        margin-top: 14px;
+        align-items: flex-start;
+      }
+      .arow .avatar {
+        width: 32px;
+        height: 32px;
+        flex: none;
+      }
+      .arow .avatar img {
+        height: 27px;
+      }
+      .bubble.a {
+        background: #fff;
+        border: 1px solid rgba(18, 24, 27, 0.1);
+        border-bottom-left-radius: 4px;
+        flex: 1;
+      }
+      #dots {
+        display: flex;
+        gap: 6px;
+        padding: 6px 0;
+      }
+      #dots i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--blue);
+      }
+      #ans ol {
+        list-style: none;
+        counter-reset: s;
+      }
+      #ans li {
+        counter-increment: s;
+        margin-bottom: 8px;
+        display: none;
+      }
+      #ans li::before {
+        content: counter(s) ". ";
+        font-weight: 700;
+        color: var(--teal);
+      }
+      #ans li b {
+        font-size: 12px;
+        color: var(--blue);
+      }
+      .src {
+        display: none;
+        margin-top: 6px;
+        padding: 6px 10px;
+        background: #dff5ea;
+        color: #14573a;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.35;
+      }
+      .gabay {
+        display: none;
+        margin: 6px 0 0 40px;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      #wave-bar {
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: 96px;
+        height: 68px;
+        border-radius: 16px;
+        background: rgba(124, 244, 255, 0.5);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        opacity: 0;
+      }
+      #wave {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        height: 36px;
+      }
+      #wave i {
+        width: 4px;
+        height: 36px;
+        border-radius: 2px;
+        background: var(--cyan);
+        transform-origin: center;
+      }
+      #wave-bar span {
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .composer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 84px;
+        background: #fff;
+        border-top: 1px solid var(--outline);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 10px 0 14px;
+      }
+      .composer svg.i {
+        font-size: 24px;
+        color: var(--muted);
+      }
+      .field {
+        flex: 1;
+        height: 52px;
+        border: 1.5px solid #6e797e;
+        border-radius: 8px;
+        padding: 0 12px;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #5c676c;
+      }
+      #mic {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--blue);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+      }
+      #mic svg.i {
+        font-size: 30px;
+        color: #fff;
+      }
+      .tap {
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 4px solid rgba(22, 138, 173, 0.9);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* nearby + send later */
+      .screen h2 {
+        font-size: 26px;
+        line-height: 1.2;
+        font-weight: 700;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid rgba(18, 24, 27, 0.08);
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(15, 76, 92, 0.06);
+      }
+      .summary {
+        margin-top: 12px;
+        padding: 12px 14px;
+      }
+      .summary b {
+        font-size: 16px;
+      }
+      .summary .row {
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .fac {
+        margin-top: 10px;
+        padding: 12px 14px;
+      }
+      .fac .top {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .ftile2 {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: var(--primary-container);
+        color: #001f29;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex: none;
+      }
+      .fac .nm {
+        flex: 1;
+      }
+      .fac .nm b {
+        font-size: 15px;
+        line-height: 1.2;
+        display: block;
+      }
+      .fac .nm span {
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .pill {
+        background: var(--secondary-container);
+        color: #0f4c5c;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 4px 11px;
+        border-radius: 999px;
+        flex: none;
+      }
+      .fac .addr {
+        font-size: 13px;
+        margin-top: 8px;
+        color: var(--carbon);
+      }
+      .fac .note {
+        margin-top: 8px;
+        padding: 8px 10px;
+        background: #fff1d6;
+        color: #6b4300;
+        border-radius: 10px;
+        font-size: 12.5px;
+      }
+      .fac .dir {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 8px;
+      }
+      .dir span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--blue);
+      }
+      .dir svg.i {
+        font-size: 17px;
+      }
+      .btn {
+        height: 56px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 17px;
+        font-weight: 700;
+        color: #fff;
+      }
+      .btn.primary {
+        background: #147d9b;
+        margin-top: 14px;
+      }
+      .help-card {
+        margin-top: 12px;
+        padding: 14px;
+        border: 2px solid var(--red);
+        border-radius: 16px;
+        background: #fff;
+      }
+      .help-card .field {
+        height: 46px;
+        margin-bottom: 10px;
+        font-size: 13px;
+      }
+      .btn.red {
+        background: var(--red);
+      }
+      .contacts {
+        margin-top: 12px;
+        padding: 12px 14px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .contacts svg.i {
+        font-size: 24px;
+        color: var(--blue);
+      }
+      .contacts b {
+        font-size: 14px;
+        display: block;
+      }
+      .contacts span {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .qhead {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 16px 0 6px;
+      }
+      #qitem {
+        padding: 12px 14px;
+        opacity: 0;
+      }
+      #qitem .t {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      #qitem .t svg.i {
+        font-size: 22px;
+        color: var(--green);
+      }
+      #qitem .m {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        font-size: 13px;
+        flex-wrap: wrap;
+      }
+      #chip-wait,
+      #chip-sent {
+        position: absolute;
+      }
+      .chipbox {
+        position: relative;
+        width: 150px;
+        height: 28px;
+        flex: none;
+      }
+      #waiting-lines {
+        margin-top: 8px;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <svg data-hf-id="hf-p3r6" width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs data-hf-id="hf-mh0t">
+        <symbol data-hf-id="hf-cv5h" id="i-check" viewBox="0 0 24 24"><circle data-hf-id="hf-m1lh" cx="12" cy="12" r="10" /><path data-hf-id="hf-yfzu" d="m9 12 2 2 4-4" /></symbol>
+        <symbol data-hf-id="hf-059q" id="i-book" viewBox="0 0 24 24"><path data-hf-id="hf-556x" d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" /></symbol>
+        <symbol data-hf-id="hf-36hm" id="i-msg" viewBox="0 0 24 24"><path data-hf-id="hf-a6uk" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></symbol>
+        <symbol data-hf-id="hf-uv5o" id="i-pin" viewBox="0 0 24 24"><path data-hf-id="hf-4rky" d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle data-hf-id="hf-d4n7" cx="12" cy="10" r="3" /></symbol>
+        <symbol data-hf-id="hf-wb73" id="i-send" viewBox="0 0 24 24"><path data-hf-id="hf-ywch" d="m22 2-7 20-4-9-9-4Z" /><path data-hf-id="hf-nzn7" d="M22 2 11 13" /></symbol>
+        <symbol data-hf-id="hf-2j2g" id="i-mic" viewBox="0 0 24 24"><path data-hf-id="hf-qgfi" d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path data-hf-id="hf-9g83" d="M19 10v2a7 7 0 0 1-14 0v-2" /><line data-hf-id="hf-oapw" x1="12" x2="12" y1="19" y2="22" /></symbol>
+        <symbol data-hf-id="hf-rngm" id="i-drop" viewBox="0 0 24 24"><path data-hf-id="hf-tm8x" d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" /></symbol>
+        <symbol data-hf-id="hf-8n9p" id="i-plus" viewBox="0 0 24 24"><path data-hf-id="hf-1zsu" d="M12 5v14M5 12h14" /></symbol>
+        <symbol data-hf-id="hf-5woj" id="i-head" viewBox="0 0 24 24"><path data-hf-id="hf-aq74" d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" /></symbol>
+        <symbol data-hf-id="hf-xabm" id="i-shield" viewBox="0 0 24 24"><path data-hf-id="hf-49ze" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /><path data-hf-id="hf-b76m" d="m9 12 2 2 4-4" /></symbol>
+        <symbol data-hf-id="hf-msv2" id="i-nav" viewBox="0 0 24 24"><polygon data-hf-id="hf-emnt" points="3 11 22 2 13 21 11 13 3 11" /></symbol>
+        <symbol data-hf-id="hf-p4k7" id="i-clock" viewBox="0 0 24 24"><circle data-hf-id="hf-jqh5" cx="12" cy="12" r="10" /><polyline data-hf-id="hf-gj1h" points="12 6 12 12 16 14" /></symbol>
+        <symbol data-hf-id="hf-c5zt" id="i-warn" viewBox="0 0 24 24"><path data-hf-id="hf-2l4s" d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path data-hf-id="hf-mlkx" d="M12 9v4" /><path data-hf-id="hf-c2s1" d="M12 17h.01" /></symbol>
+        <symbol data-hf-id="hf-nmvb" id="i-hosp" viewBox="0 0 24 24"><path data-hf-id="hf-niaa" d="M12 6v4" /><path data-hf-id="hf-g8vy" d="M14 14h-4" /><path data-hf-id="hf-h2vm" d="M14 18h-4" /><path data-hf-id="hf-3nkn" d="M14 8h-4" /><path data-hf-id="hf-w5r5" d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2" /><path data-hf-id="hf-j7gg" d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18Z" /></symbol>
+        <symbol data-hf-id="hf-9udw" id="i-home" viewBox="0 0 24 24"><path data-hf-id="hf-4suk" d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline data-hf-id="hf-d1au" points="9 22 9 12 15 12 15 22" /></symbol>
+        <symbol data-hf-id="hf-swq8" id="i-people" viewBox="0 0 24 24"><path data-hf-id="hf-frh1" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle data-hf-id="hf-nb88" cx="9" cy="7" r="4" /><path data-hf-id="hf-p3fz" d="M22 21v-2a4 4 0 0 0-3-3.87" /><path data-hf-id="hf-53jq" d="M16 3.13a4 4 0 0 1 0 7.75" /></symbol>
+      </defs>
+    </svg>
+
+    <div data-hf-id="hf-ynjl" id="root" data-composition-id="main" data-start="0" data-duration="25" data-width="1920" data-height="1080">
+      <!-- Backgrounds -->
+      <div data-hf-id="hf-krba" id="bg" class="clip" data-start="0" data-duration="25" data-track-index="0">
+        <div data-hf-id="hf-jvk9" id="bg-cream"></div>
+        <div data-hf-id="hf-n1xf" id="bg-light"><div data-hf-id="hf-fo44" id="bg-orb"></div></div>
+      </div>
+
+      <!-- Scene 1: hook -->
+      <section data-hf-id="hf-6g15" id="s1" class="clip" data-start="0" data-duration="3.5" data-track-index="1">
+        <div data-hf-id="hf-d71p" class="center-stack" id="s1-stack">
+          <div data-hf-id="hf-fssp" class="glow" id="s1-glow"></div>
+          <img data-hf-id="hf-ip0x" class="mascot" id="s1-mascot" src="assets/img/mascot.png" alt="Floodini mascot">
+          <div data-hf-id="hf-hujw" class="wordmark" id="s1-word">Floodini</div>
+          <div data-hf-id="hf-sgjj" class="tagline" id="s1-tag">Handa kahit offline.</div>
+        </div>
+      </section>
+
+      <!-- Feature cards -->
+      <section data-hf-id="hf-uc6j" id="card-chat" class="clip" data-start="3.5" data-duration="7.5" data-track-index="2">
+        <div data-hf-id="hf-zo5s" class="fcard"><div data-hf-id="hf-3uuy" class="fcard-inner" id="card-chat-in">
+          <div data-hf-id="hf-vycy" class="ftile"><svg data-hf-id="hf-2d72" class="i"><use data-hf-id="hf-b3tp" href="#i-msg" /></svg></div>
+          <div data-hf-id="hf-y6jj" class="ftitle">Offline AI Chat</div>
+          <div data-hf-id="hf-4ezf" class="fline" id="cc-l1">Ask in Filipino, English, or Taglish.</div>
+          <div data-hf-id="hf-qu0w" class="fline" id="cc-l2">Runs on your phone after a one-time download.</div>
+        </div></div>
+      </section>
+      <section data-hf-id="hf-su8i" id="card-near" class="clip" data-start="11" data-duration="4.5" data-track-index="2">
+        <div data-hf-id="hf-gtew" class="fcard"><div data-hf-id="hf-1tce" class="fcard-inner" id="card-near-in">
+          <div data-hf-id="hf-82gm" class="ftile"><svg data-hf-id="hf-cvo2" class="i"><use data-hf-id="hf-m1dv" href="#i-pin" /></svg></div>
+          <div data-hf-id="hf-kmsh" class="ftitle">Nearby Aid</div>
+          <div data-hf-id="hf-l35t" class="fline" id="cn-l1">Hospitals, clinics, and shelter candidates.</div>
+          <div data-hf-id="hf-ic23" class="fline" id="cn-l2">Walking directions in one tap.</div>
+        </div></div>
+      </section>
+      <section data-hf-id="hf-p7wo" id="card-send" class="clip" data-start="15.5" data-duration="5.5" data-track-index="2">
+        <div data-hf-id="hf-fmht" class="fcard"><div data-hf-id="hf-gj8y" class="fcard-inner" id="card-send-in">
+          <div data-hf-id="hf-8grn" class="ftile"><svg data-hf-id="hf-d9z3" class="i"><use data-hf-id="hf-kkf4" href="#i-send" /></svg></div>
+          <div data-hf-id="hf-onew" class="ftitle">Send Later</div>
+          <div data-hf-id="hf-w95i" class="fline" id="cs-l1">Queue “I’m safe” or a help request.</div>
+          <div data-hf-id="hf-nug0" class="fline" id="cs-l2">Texts your contacts when signal returns.</div>
+        </div></div>
+      </section>
+
+      <!-- Phone -->
+      <section data-hf-id="hf-q5z8" id="phone" class="clip" data-start="3.5" data-duration="17.5" data-track-index="3">
+        <div data-hf-id="hf-4yli" id="phone-pos">
+          <div data-hf-id="hf-3bnb" id="phone-frame">
+            <div data-hf-id="hf-ojuc" id="phone-screen">
+              <div data-hf-id="hf-36t3" id="ui">
+                <div data-hf-id="hf-8kim" class="status">
+                  <span data-hf-id="hf-zwmt">9:41</span>
+                  <span data-hf-id="hf-as26" class="status-r">
+                    <span data-hf-id="hf-fo2b" id="nosvc">No service</span>
+                    <span data-hf-id="hf-41uz" class="bars"><i data-hf-id="hf-wt6k"></i><i data-hf-id="hf-zeb8"></i><i data-hf-id="hf-y7e5"></i><i data-hf-id="hf-ylp6"></i><span data-hf-id="hf-yhh9" id="slash"></span></span>
+                    <span data-hf-id="hf-7g6e" class="batt"></span>
+                  </span>
+                </div>
+                <div data-hf-id="hf-4y7z" class="header">
+                  <div data-hf-id="hf-zsct" class="brand">
+                    <div data-hf-id="hf-o4a3" class="avatar"><img data-hf-id="hf-zp8q" src="assets/img/mascot.png" alt=""></div>
+                    Floodini
+                  </div>
+                  <span data-hf-id="hf-1ksi" class="chip safe"><span data-hf-id="hf-9gry" class="dot"></span>Offline mode · Handa na</span>
+                </div>
+
+                <div data-hf-id="hf-2t3w" class="body">
+                  <!-- Chat -->
+                  <div data-hf-id="hf-58u9" class="screen" id="screen-chat">
+                    <div data-hf-id="hf-7bg2" class="chips-row">
+                      <span data-hf-id="hf-i48w" class="chip safe"><svg data-hf-id="hf-doa4" class="i"><use data-hf-id="hf-yk3y" href="#i-check" /></svg>Ready to chat</span>
+                      <span data-hf-id="hf-dy5w" class="chip safe"><svg data-hf-id="hf-e2l5" class="i"><use data-hf-id="hf-4d91" href="#i-book" /></svg>Guides saved</span>
+                    </div>
+                    <div data-hf-id="hf-l0cn" id="chat-empty">
+                      <img data-hf-id="hf-095a" src="assets/img/mascot.png" alt="">
+                      <h3 data-hf-id="hf-5d0e">Kumusta? Nandito si Floodini.</h3>
+                      <p data-hf-id="hf-tzsk">Magtanong sa Filipino, English, o Taglish.</p>
+                      <div data-hf-id="hf-futr" class="tiles-label">Mabilis na tanong</div>
+                      <div data-hf-id="hf-hovr" class="tiles">
+                        <div data-hf-id="hf-38j2" class="tile"><svg data-hf-id="hf-egw6" class="i"><use data-hf-id="hf-c6zp" href="#i-drop" /></svg>Baha</div>
+                        <div data-hf-id="hf-nzht" class="tile"><svg data-hf-id="hf-ev77" class="i"><use data-hf-id="hf-r1rm" href="#i-plus" /></svg>Sugat at Pagdurugo</div>
+                        <div data-hf-id="hf-d9zo" class="tile"><svg data-hf-id="hf-f9i8" class="i"><use data-hf-id="hf-ctyx" href="#i-drop" /></svg>Tubig-baha</div>
+                        <div data-hf-id="hf-5boc" class="tile"><svg data-hf-id="hf-58xp" class="i"><use data-hf-id="hf-8nki" href="#i-check" /></svg>Pagkatapos ng baha</div>
+                      </div>
+                    </div>
+                    <div data-hf-id="hf-24dx" id="chat-convo">
+                      <div data-hf-id="hf-r0bx" class="bubble u" id="ubub">Paano gamutin ang sugat at pagdurugo?</div>
+                      <div data-hf-id="hf-jx2a" class="arow" id="arow">
+                        <div data-hf-id="hf-z7gr" class="avatar"><img data-hf-id="hf-0ngb" src="assets/img/mascot.png" alt=""></div>
+                        <div data-hf-id="hf-744n" class="bubble a" id="ans">
+                          <div data-hf-id="hf-wvbl" id="dots"><i data-hf-id="hf-0l8b"></i><i data-hf-id="hf-0zjc"></i><i data-hf-id="hf-zsm9"></i></div>
+                          <ol data-hf-id="hf-eaxy">
+                            <li data-hf-id="hf-80az" id="st1">Kung dumudugo, diinan ang sugat gamit ang malinis na tela. <b data-hf-id="hf-7rlw">[1]</b></li>
+                            <li data-hf-id="hf-fo8g" id="st2">Takpan ng waterproof na bandage ang malinis na sugat. <b data-hf-id="hf-3ef0">[1]</b></li>
+                            <li data-hf-id="hf-9z90" id="st3">Humingi ng medikal na tulong kung malalim ang sugat o hindi tumitigil ang dugo.</li>
+                          </ol>
+                          <div data-hf-id="hf-renm" class="src" id="src">[1] Emergency Wound Care After a Natural Disaster · CDC</div>
+                        </div>
+                      </div>
+                      <div data-hf-id="hf-ou78" class="gabay" id="gabay">Gabay ito at hindi kapalit ng propesyonal na tulong.</div>
+                    </div>
+                    <div data-hf-id="hf-styi" id="wave-bar"><div data-hf-id="hf-4822" id="wave"></div><span data-hf-id="hf-31ds">Nakikinig… magsalita na</span></div>
+                    <div data-hf-id="hf-cydq" class="composer">
+                      <svg data-hf-id="hf-5n8q" class="i"><use data-hf-id="hf-q8ae" href="#i-plus" /></svg>
+                      <div data-hf-id="hf-5h3l" class="field">I-type ang tanong…</div>
+                      <svg data-hf-id="hf-d2km" class="i"><use data-hf-id="hf-9i6c" href="#i-head" /></svg>
+                      <div data-hf-id="hf-zjrq" id="mic"><svg data-hf-id="hf-co9l" class="i"><use data-hf-id="hf-2atz" href="#i-mic" /></svg></div>
+                    </div>
+                    <div data-hf-id="hf-6jzb" class="tap" id="tap-mic" style="left: 314px; top: 604px"></div>
+                  </div>
+
+                  <!-- Nearby -->
+                  <div data-hf-id="hf-2k7h" class="screen" id="screen-near">
+                    <h2 data-hf-id="hf-mtem">Nearby aid</h2>
+                    <div data-hf-id="hf-nvh6" class="card summary">
+                      <b data-hf-id="hf-ua9m">Found 3 mapped result(s)</b>
+                      <div data-hf-id="hf-thy4" class="row">
+                        <span data-hf-id="hf-lhgx" class="chip neutral"><svg data-hf-id="hf-dv6o" class="i"><use data-hf-id="hf-snib" href="#i-pin" /></svg>Location ±8 m</span>
+                        <span data-hf-id="hf-bxd1" class="chip neutral"><svg data-hf-id="hf-dgvn" class="i"><use data-hf-id="hf-8qr0" href="#i-clock" /></svg>Map data: Oct 9, 2026</span>
+                      </div>
+                    </div>
+                    <div data-hf-id="hf-ot6h" class="card fac" id="fac1">
+                      <div data-hf-id="hf-sijt" class="top">
+                        <div data-hf-id="hf-4vvw" class="ftile2"><svg data-hf-id="hf-bhci" class="i"><use data-hf-id="hf-epq8" href="#i-hosp" /></svg></div>
+                        <div data-hf-id="hf-l113" class="nm"><b data-hf-id="hf-522d">Marikina City Health Center</b><span data-hf-id="hf-ckzn">Clinic / health center</span></div>
+                        <div data-hf-id="hf-1q9o" class="pill">1.2 km</div>
+                      </div>
+                      <div data-hf-id="hf-ukuj" class="addr">Marikina</div>
+                      <div data-hf-id="hf-94b1" class="dir"><span data-hf-id="hf-gaur" id="dir1"><svg data-hf-id="hf-b31h" class="i"><use data-hf-id="hf-jhch" href="#i-nav" /></svg>Walking directions</span></div>
+                    </div>
+                    <div data-hf-id="hf-uywa" class="card fac" id="fac2">
+                      <div data-hf-id="hf-8kpp" class="top">
+                        <div data-hf-id="hf-vf2c" class="ftile2"><svg data-hf-id="hf-c9yk" class="i"><use data-hf-id="hf-8ka7" href="#i-home" /></svg></div>
+                        <div data-hf-id="hf-eph3" class="nm"><b data-hf-id="hf-0g1u">Possible evacuation center</b><span data-hf-id="hf-fblf">Shelter candidate</span></div>
+                        <div data-hf-id="hf-nxy9" class="pill">2.4 km</div>
+                      </div>
+                      <div data-hf-id="hf-pi84" class="note">Mapped as a possible facility; confirm before relying on it.</div>
+                    </div>
+                    <div data-hf-id="hf-yx0b" class="card fac" id="fac3">
+                      <div data-hf-id="hf-9rms" class="top">
+                        <div data-hf-id="hf-u859" class="ftile2"><svg data-hf-id="hf-bvnj" class="i"><use data-hf-id="hf-2rp4" href="#i-hosp" /></svg></div>
+                        <div data-hf-id="hf-eb62" class="nm"><b data-hf-id="hf-k2gb">Lung Center of the Philippines</b><span data-hf-id="hf-bcrb">Hospital</span></div>
+                        <div data-hf-id="hf-29yc" class="pill">6.1 km</div>
+                      </div>
+                      <div data-hf-id="hf-vcso" class="addr">Quezon City</div>
+                    </div>
+                    <div data-hf-id="hf-ofs5" class="tap" id="tap-dir" style="left: 252px; top: 224px; width: 52px; height: 52px"></div>
+                  </div>
+
+                  <!-- Send later -->
+                  <div data-hf-id="hf-l02t" class="screen" id="screen-send">
+                    <h2 data-hf-id="hf-4m27">Send later</h2>
+                    <div data-hf-id="hf-6u0s" class="btn primary" id="btn-safe"><svg data-hf-id="hf-u61z" class="i" style="font-size:20px"><use data-hf-id="hf-6qr9" href="#i-shield" /></svg>Queue “I’m safe” · Ligtas ako</div>
+                    <div data-hf-id="hf-7z94" class="help-card">
+                      <div data-hf-id="hf-qvyu" class="field">Optional note for the help request</div>
+                      <div data-hf-id="hf-ikce" class="btn red"><svg data-hf-id="hf-8n2f" class="i" style="font-size:20px"><use data-hf-id="hf-d33y" href="#i-warn" /></svg>Queue help request</div>
+                    </div>
+                    <div data-hf-id="hf-0xux" class="card contacts">
+                      <svg data-hf-id="hf-9w4e" class="i"><use data-hf-id="hf-v3or" href="#i-people" /></svg>
+                      <div data-hf-id="hf-yeow"><b data-hf-id="hf-squu">Juan Dela Cruz · 2 contact(s)</b><span data-hf-id="hf-9d09">Maria Dela Cruz, Pedro Santos</span></div>
+                    </div>
+                    <div data-hf-id="hf-etea" class="qhead">Queue</div>
+                    <div data-hf-id="hf-0j58" class="card" id="qitem">
+                      <div data-hf-id="hf-yria" class="t"><svg data-hf-id="hf-9htd" class="i"><use data-hf-id="hf-kmy1" href="#i-shield" /></svg>I’m safe</div>
+                      <div data-hf-id="hf-6h7h" class="m">
+                        <div data-hf-id="hf-r3gd" class="chipbox">
+                          <span data-hf-id="hf-zuwd" class="chip warn" id="chip-wait"><svg data-hf-id="hf-egbh" class="i"><use data-hf-id="hf-tp8k" href="#i-clock" /></svg>Waiting for signal</span>
+                          <span data-hf-id="hf-bqee" class="chip safe" id="chip-sent" style="opacity: 0"><svg data-hf-id="hf-eumi" class="i"><use data-hf-id="hf-91vj" href="#i-check" /></svg>Sent</span>
+                        </div>
+                        <span data-hf-id="hf-4v2l" id="qcount">0/2 sent · queued just now</span>
+                      </div>
+                      <div data-hf-id="hf-fgbu" id="waiting-lines">Maria Dela Cruz: waiting for signal<br data-hf-id="hf-x5px">Pedro Santos: waiting for signal</div>
+                    </div>
+                    <div data-hf-id="hf-5ut2" class="tap" id="tap-safe" style="left: 163px; top: 62px; width: 56px; height: 56px"></div>
+                  </div>
+                </div>
+
+                <div data-hf-id="hf-e5hr" class="nav">
+                  <div data-hf-id="hf-4c8w" id="nav-ind"></div>
+                  <div data-hf-id="hf-jmbt" class="nav-item on" id="nv1"><svg data-hf-id="hf-f8xj" class="i"><use data-hf-id="hf-y8tt" href="#i-msg" /></svg>Chat</div>
+                  <div data-hf-id="hf-b04g" class="nav-item" id="nv2"><svg data-hf-id="hf-fn8k" class="i"><use data-hf-id="hf-s97a" href="#i-pin" /></svg>Nearby</div>
+                  <div data-hf-id="hf-66h2" class="nav-item" id="nv3"><svg data-hf-id="hf-g1jl" class="i"><use data-hf-id="hf-aogo" href="#i-send" /></svg>Send later</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 5: outro -->
+      <section data-hf-id="hf-5qpx" id="s5" class="clip" data-start="21" data-duration="4" data-track-index="4">
+        <div data-hf-id="hf-gobo" class="center-stack">
+          <div data-hf-id="hf-ltbp" class="glow" id="s5-glow"></div>
+          <img data-hf-id="hf-6gnq" class="mascot" id="s5-mascot" src="assets/img/mascot.png" alt="Floodini mascot" style="width: 258px; height: 303px">
+          <div data-hf-id="hf-kcbz" class="wordmark" id="s5-word" style="font-size: 112px">Floodini</div>
+          <div data-hf-id="hf-fafn" class="tagline" id="s5-tag">Handa kahit offline.</div>
+          <div data-hf-id="hf-m5c2" class="built" id="s5-built">Built for the Philippines.</div>
+          <div data-hf-id="hf-r0ck" class="disclaimer" id="s5-disc">Not an official emergency service.</div>
+        </div>
+      </section>
+
+      <!-- Audio: music bed with ducking under the narration -->
+      <audio data-hf-id="hf-fss8" id="music" src="assets/music/bed.mp3" data-start="0" data-duration="25" data-track-index="5" data-volume="1" data-automation="{&quot;version&quot;:1,&quot;lanes&quot;:[{&quot;target&quot;:&quot;volume&quot;,&quot;points&quot;:[{&quot;t&quot;:0,&quot;v&quot;:0},{&quot;t&quot;:0.4,&quot;v&quot;:0.3},{&quot;t&quot;:0.7,&quot;v&quot;:0.14},{&quot;t&quot;:2.6,&quot;v&quot;:0.14},{&quot;t&quot;:2.9,&quot;v&quot;:0.34},{&quot;t&quot;:3.7,&quot;v&quot;:0.34},{&quot;t&quot;:4.0,&quot;v&quot;:0.14},{&quot;t&quot;:10.4,&quot;v&quot;:0.14},{&quot;t&quot;:10.7,&quot;v&quot;:0.34},{&quot;t&quot;:11.1,&quot;v&quot;:0.34},{&quot;t&quot;:11.4,&quot;v&quot;:0.14},{&quot;t&quot;:13.85,&quot;v&quot;:0.14},{&quot;t&quot;:14.15,&quot;v&quot;:0.34},{&quot;t&quot;:15.6,&quot;v&quot;:0.34},{&quot;t&quot;:16.0,&quot;v&quot;:0.14},{&quot;t&quot;:19.75,&quot;v&quot;:0.14},{&quot;t&quot;:20.1,&quot;v&quot;:0.36},{&quot;t&quot;:21.4,&quot;v&quot;:0.36},{&quot;t&quot;:21.7,&quot;v&quot;:0.14},{&quot;t&quot;:23.9,&quot;v&quot;:0.14},{&quot;t&quot;:24.2,&quot;v&quot;:0.26},{&quot;t&quot;:25,&quot;v&quot;:0}]}]}"></audio>
+
+      <!-- Narration (Kokoro af_heart) -->
+      <audio data-hf-id="hf-nohf" id="vo1" src="assets/audio/vo-1.wav" data-start="0.4" data-duration="2.14" data-track-index="6" data-volume="1"></audio>
+      <audio data-hf-id="hf-j6kn" id="vo2" src="assets/audio/vo-2.wav" data-start="3.9" data-duration="6.45" data-track-index="6" data-volume="1"></audio>
+      <audio data-hf-id="hf-3rf2" id="vo3" src="assets/audio/vo-3.wav" data-start="11.3" data-duration="2.5" data-track-index="6" data-volume="1"></audio>
+      <audio data-hf-id="hf-wl5s" id="vo4" src="assets/audio/vo-4.wav" data-start="15.9" data-duration="3.8" data-track-index="6" data-volume="1"></audio>
+      <audio data-hf-id="hf-1hss" id="vo5" src="assets/audio/vo-5.wav" data-start="21.6" data-duration="2.25" data-track-index="6" data-volume="1"></audio>
+
+      <!-- SFX -->
+      <audio data-hf-id="hf-00ct" id="sfx-pop1" src="assets/sfx/pop.ogg" data-start="0.1" data-duration="0.18" data-track-index="7" data-volume="0.5"></audio>
+      <audio data-hf-id="hf-gnpj" id="sfx-tap1" src="assets/sfx/tap.ogg" data-start="4.9" data-duration="0.06" data-track-index="7" data-volume="0.6"></audio>
+      <audio data-hf-id="hf-dfwr" id="sfx-card1" src="assets/sfx/card-slide.ogg" data-start="13.11" data-duration="0.6" data-track-index="7" data-volume="0.45"></audio>
+      <audio data-hf-id="hf-8l0d" id="sfx-card2" src="assets/sfx/card-slide.ogg" data-start="13.66" data-duration="0.6" data-track-index="8" data-volume="0.45"></audio>
+      <audio data-hf-id="hf-64ly" id="sfx-card3" src="assets/sfx/card-slide.ogg" data-start="14.2" data-duration="0.6" data-track-index="9" data-volume="0.45"></audio>
+      <audio data-hf-id="hf-5w6y" id="sfx-tap2" src="assets/sfx/tap.ogg" data-start="14.75" data-duration="0.06" data-track-index="7" data-volume="0.6"></audio>
+      <audio data-hf-id="hf-x3eu" id="sfx-tap3" src="assets/sfx/tap.ogg" data-start="17.02" data-duration="0.06" data-track-index="7" data-volume="0.6"></audio>
+      <audio data-hf-id="hf-ew6l" id="sfx-sent" src="assets/sfx/sent.ogg" data-start="19.3" data-duration="0.12" data-track-index="7" data-volume="0.55"></audio>
+      <audio data-hf-id="hf-iw96" id="sfx-pop2" src="assets/sfx/pop.ogg" data-start="21.15" data-duration="0.18" data-track-index="7" data-volume="0.5"></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const IN = "power3.out";
+      const OUT = "power2.in";
+
+      // Build the waveform bars (deterministic).
+      const wave = document.getElementById("wave");
+      for (let i = 0; i < 28; i++) wave.appendChild(document.createElement("i"));
+
+      // ---------- initial states ----------
+      gsap.set("#screen-near, #screen-send", { opacity: 0 });
+      gsap.set("#phone-pos", { opacity: 0, x: 160 });
+      gsap.set("#card-chat-in, #card-near-in, #card-send-in", { opacity: 0, x: -70 });
+      gsap.set("#cc-l1, #cc-l2, #cn-l1, #cn-l2, #cs-l1, #cs-l2", { opacity: 0, y: 14 });
+      gsap.set("#chat-convo", { opacity: 0 });
+      gsap.set("#arow, #gabay", { opacity: 0 });
+      gsap.set("#fac1, #fac2, #fac3", { opacity: 0, y: 40 });
+      gsap.set("#s5-mascot, #s5-glow", { opacity: 0, scale: 0.7 });
+      gsap.set("#s5-word, #s5-tag, #s5-built, #s5-disc", { opacity: 0, y: 22 });
+
+      // ---------- Scene 1: hook (0 - 3.5) ----------
+      tl.fromTo("#s1-mascot", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.55, ease: "back.out(1.6)" }, 0.1);
+      tl.fromTo("#s1-glow", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.9, ease: IN }, 0.1);
+      tl.to("#s1-glow", { scale: 1.07, duration: 1.2, ease: "sine.inOut", yoyo: true, repeat: 1 }, 1.0);
+      tl.fromTo("#s1-word", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, ease: IN }, 0.55);
+      tl.fromTo("#s1-tag", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.5, ease: IN }, 0.95);
+      tl.to("#s1-stack", { x: -140, opacity: 0, duration: 0.35, ease: OUT }, 3.15);
+
+      // wipe to the app surface
+      tl.to("#bg-light", { clipPath: "inset(0 0 0 0%)", duration: 0.45, ease: "power2.inOut" }, 3.1);
+
+      // ---------- phone in (3.5) ----------
+      tl.to("#phone-pos", { opacity: 1, x: 0, duration: 0.5, ease: IN }, 3.5);
+
+      // ---------- Scene 2: chat (3.5 - 11) ----------
+      tl.to("#card-chat-in", { opacity: 1, x: 0, duration: 0.45, ease: IN }, 3.7);
+      tl.to("#cc-l1", { opacity: 1, y: 0, duration: 0.4, ease: IN }, 4.4);
+      tl.to("#cc-l2", { opacity: 1, y: 0, duration: 0.4, ease: IN }, 5.5);
+
+      // mic tap at 4.9
+      tl.to("#mic", { scale: 0.9, duration: 0.1, ease: "power2.in" }, 4.9);
+      tl.to("#mic", { scale: 1, duration: 0.2, ease: "back.out(2)" }, 5.0);
+      tl.fromTo("#tap-mic", { opacity: 0.9, scale: 0.4 }, { opacity: 0, scale: 1.5, duration: 0.55, ease: "power2.out" }, 4.9);
+
+      // waveform bar 5.0 - 6.5
+      tl.to("#wave-bar", { opacity: 1, duration: 0.25 }, 5.0);
+      const bars = wave.querySelectorAll("i");
+      bars.forEach((bar, i) => {
+        const dur = 0.16 + (i % 5) * 0.035;
+        const reps = Math.max(1, Math.floor(1.4 / dur) - 1);
+        const peak = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(i * 1.3));
+        tl.fromTo(bar, { scaleY: 0.22 }, { scaleY: peak, duration: dur, ease: "sine.inOut", yoyo: true, repeat: reps }, 5.0 + (i % 4) * 0.02);
+      });
+      tl.to("#wave-bar", { opacity: 0, duration: 0.25 }, 6.45);
+
+      // empty state out, conversation in
+      tl.to("#chat-empty", { opacity: 0, duration: 0.3 }, 6.5);
+      tl.set("#chat-convo", { opacity: 1 }, 6.55);
+      tl.fromTo("#ubub", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.4, ease: IN }, 6.6);
+      tl.to("#arow", { opacity: 1, duration: 0.3 }, 7.4);
+      tl.fromTo("#dots i", { opacity: 0.3 }, { opacity: 1, duration: 0.3, stagger: 0.12, yoyo: true, repeat: 3 }, 7.4);
+      tl.set("#dots", { display: "none" }, 8.7);
+      tl.set("#st1", { display: "list-item" }, 8.74);
+      tl.from("#st1", { opacity: 0, y: 8, duration: 0.3, ease: IN }, 8.74);
+      tl.set("#st2", { display: "list-item" }, 9.29);
+      tl.from("#st2", { opacity: 0, y: 8, duration: 0.3, ease: IN }, 9.29);
+      tl.set("#st3", { display: "list-item" }, 9.83);
+      tl.from("#st3", { opacity: 0, y: 8, duration: 0.3, ease: IN }, 9.83);
+      tl.set("#src", { display: "block" }, 10.3);
+      tl.from("#src", { opacity: 0, y: 6, duration: 0.3, ease: IN }, 10.3);
+      tl.set("#gabay", { display: "block" }, 10.45);
+      tl.to("#gabay", { opacity: 1, duration: 0.3 }, 10.45);
+
+      // card out
+      tl.to("#card-chat-in", { opacity: 0, x: -60, duration: 0.35, ease: OUT }, 10.65);
+
+      // ---------- Scene 3: nearby (11 - 15.5) ----------
+      tl.to("#screen-chat", { opacity: 0, x: -40, duration: 0.28, ease: OUT }, 10.7);
+      tl.fromTo("#screen-near", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.4, ease: IN }, 11.0);
+      tl.to("#nav-ind", { x: 130, duration: 0.35, ease: "power2.inOut" }, 11.0);
+      tl.set("#nv1", { className: "nav-item" }, 11.0);
+      tl.set("#nv2", { className: "nav-item on" }, 11.0);
+      tl.to("#card-near-in", { opacity: 1, x: 0, duration: 0.45, ease: IN }, 11.15);
+      tl.to("#cn-l1", { opacity: 1, y: 0, duration: 0.4, ease: IN }, 11.8);
+      tl.to("#cn-l2", { opacity: 1, y: 0, duration: 0.4, ease: IN }, 12.5);
+      tl.to("#fac1", { opacity: 1, y: 0, duration: 0.4, ease: IN }, 13.11);
+      tl.to("#fac2", { opacity: 1, y: 0, duration: 0.4, ease: IN }, 13.66);
+      tl.to("#fac3", { opacity: 1, y: 0, duration: 0.4, ease: IN }, 14.2);
+      // simulated tap on "Walking directions"
+      tl.fromTo("#tap-dir", { opacity: 0.9, scale: 0.4 }, { opacity: 0, scale: 1.4, duration: 0.5, ease: "power2.out" }, 14.75);
+      tl.fromTo("#dir1", { backgroundColor: "rgba(22,138,173,0)" }, { backgroundColor: "rgba(187,233,255,1)", duration: 0.2 }, 14.78);
+      tl.to("#card-near-in", { opacity: 0, x: -60, duration: 0.35, ease: OUT }, 15.15);
+
+      // ---------- Scene 4: send later (15.5 - 21) ----------
+      tl.to("#screen-near", { opacity: 0, x: -40, duration: 0.28, ease: OUT }, 15.2);
+      tl.fromTo("#screen-send", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.4, ease: IN }, 15.5);
+      tl.to("#nav-ind", { x: 260, duration: 0.35, ease: "power2.inOut" }, 15.5);
+      tl.set("#nv2", { className: "nav-item" }, 15.5);
+      tl.set("#nv3", { className: "nav-item on" }, 15.5);
+      tl.to("#card-send-in", { opacity: 1, x: 0, duration: 0.45, ease: IN }, 15.65);
+      tl.to("#cs-l1", { opacity: 1, y: 0, duration: 0.4, ease: IN }, 16.25);
+      tl.to("#cs-l2", { opacity: 1, y: 0, duration: 0.4, ease: IN }, 17.2);
+      // tap "I'm safe" at 17.02
+      tl.to("#btn-safe", { scale: 0.97, duration: 0.1, ease: "power2.in" }, 17.02);
+      tl.to("#btn-safe", { scale: 1, duration: 0.2, ease: "back.out(2)" }, 17.12);
+      tl.fromTo("#tap-safe", { opacity: 0.9, scale: 0.4 }, { opacity: 0, scale: 1.6, duration: 0.55, ease: "power2.out" }, 17.02);
+      tl.fromTo("#qitem", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4, ease: IN }, 17.45);
+      // signal returns
+      tl.to("#nosvc", { opacity: 0, duration: 0.25 }, 18.7);
+      tl.to("#slash", { opacity: 0, duration: 0.25 }, 18.7);
+      tl.to(".bars i", { opacity: 1, duration: 0.2, stagger: 0.1 }, 18.75);
+      // chip flips to Sent
+      tl.to("#chip-wait", { opacity: 0, duration: 0.2 }, 19.3);
+      tl.to("#chip-sent", { opacity: 1, duration: 0.25 }, 19.35);
+      tl.to("#waiting-lines", { opacity: 0, duration: 0.25 }, 19.3);
+      tl.set("#waiting-lines", { display: "none" }, 19.6);
+      tl.set("#qcount", { textContent: "2/2 sent · queued just now" }, 19.3);
+      // out
+      tl.to("#card-send-in", { opacity: 0, x: -60, duration: 0.35, ease: OUT }, 20.55);
+      tl.to("#phone-pos", { opacity: 0, x: 140, duration: 0.45, ease: OUT }, 20.6);
+      tl.to("#bg-light", { opacity: 0, duration: 0.45 }, 20.8);
+
+      // ---------- Scene 5: outro (21 - 25) ----------
+      tl.to("#s5-mascot", { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 21.15);
+      tl.to("#s5-glow", { opacity: 1, scale: 1, duration: 0.8, ease: IN }, 21.15);
+      tl.to("#s5-word", { opacity: 1, y: 0, duration: 0.5, ease: IN }, 21.55);
+      tl.to("#s5-tag", { opacity: 1, y: 0, duration: 0.5, ease: IN }, 21.95);
+      tl.to("#s5-built", { opacity: 1, y: 0, duration: 0.45, ease: IN }, 22.4);
+      tl.to("#s5-disc", { opacity: 1, y: 0, duration: 0.45, ease: IN }, 22.6);
+      tl.to("#s5-glow", { scale: 1.07, duration: 1.1, ease: "sine.inOut", yoyo: true, repeat: 1 }, 22.93);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

@@ -5,13 +5,25 @@ abstract interface class SpeechTestBackend {
     required void Function(int progress) onProgress,
   });
 
-  Future<void> startRecording();
+  /// Records from the microphone and returns the Filipino transcript.
+  ///
+  /// Stops by itself once speech has been heard and then goes quiet, after
+  /// [maxDuration], or after [waitForSpeech] with no speech at all. Returns an
+  /// empty string when nothing was said or when [cancelListening] was called.
+  Future<String> listen({
+    Duration maxDuration = const Duration(seconds: 28),
+    Duration silenceAfterSpeech = const Duration(milliseconds: 1500),
+    Duration waitForSpeech = const Duration(seconds: 8),
+  });
 
-  Future<String> stopAndTranscribe();
+  /// Ends an active [listen] without transcribing it.
+  Future<void> cancelListening();
 
   Future<FilipinoTtsVoiceStatus> checkFilipinoVoice();
 
-  Future<void> speakFilipino(String text);
+  /// Speaks [text] with the installed Filipino voice, or the phone's default
+  /// voice when none is installed. Completes when speech finishes.
+  Future<void> speak(String text);
 
   Future<void> stopSpeaking();
 

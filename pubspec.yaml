@@ -1,4 +1,4 @@
-name: walang_signal
+name: floodini
 description: "A new Flutter project."
 publish_to: 'none'
 version: 0.1.0+1
@@ -22,6 +22,7 @@ dependencies:
   path_provider: ^2.1.6
   record: ^7.1.1
   shared_preferences: ^2.5.6
+  url_launcher: ^6.3.3
   yaml: ^3.1.4
 
 dev_dependencies:
@@ -32,6 +33,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/images/
     - assets/export.geojson
     - assets/who_flood_safety_rag.md
     - assets/pagasa_floods_citizen.md

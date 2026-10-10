@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:walang_signal/features/locations/domain/aid_facility.dart';
-import 'package:walang_signal/features/locations/domain/aid_facility_repository.dart';
-import 'package:walang_signal/features/locations/domain/location_provider.dart';
-import 'package:walang_signal/features/locations/domain/nearby_aid_finder.dart';
+import 'package:floodini/features/locations/domain/aid_facility.dart';
+import 'package:floodini/features/locations/domain/aid_facility_repository.dart';
+import 'package:floodini/features/locations/domain/location_provider.dart';
+import 'package:floodini/features/locations/domain/nearby_aid_finder.dart';
 
 void main() {
   test(

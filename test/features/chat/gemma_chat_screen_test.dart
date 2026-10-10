@@ -2,11 +2,12 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:walang_signal/features/chat/domain/chat_image_picker.dart';
-import 'package:walang_signal/features/chat/domain/gemma_chat_backend.dart';
-import 'package:walang_signal/features/chat/presentation/gemma_chat_screen.dart';
-import 'package:walang_signal/features/knowledge/domain/knowledge_base.dart';
-import 'package:walang_signal/features/knowledge/domain/retrieved_passage.dart';
+import 'package:floodini/features/chat/domain/chat_image_picker.dart';
+import 'package:floodini/features/chat/domain/gemma_chat_backend.dart';
+import 'package:floodini/features/chat/presentation/gemma_chat_screen.dart';
+import 'package:floodini/features/knowledge/domain/knowledge_base.dart';
+import 'package:floodini/features/knowledge/domain/retrieved_passage.dart';
+import 'package:floodini/features/speech/domain/speech_test_backend.dart';
 
 void main() {
   testWidgets('installs Gemma 4 E2B before enabling chat', (tester) async {
@@ -184,6 +185,113 @@ void main() {
     expect(backend.sentPrompts.single, contains('Water is rising'));
     expect(find.text('Water is rising'), findsOneWidget);
   });
+
+  testWidgets('sends what the mic hears as a chat message', (tester) async {
+    final backend = _FakeGemmaChatBackend(installed: true);
+    final speech = _FakeSpeech(heard: ['Ano ang gagawin sa baha?']);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: GemmaChatScreen(backend: backend, speech: speech),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('mic-button')));
+    await tester.pumpAndSettle();
+
+    expect(backend.sentPrompts, ['Ano ang gagawin sa baha?']);
+    expect(find.text('A sample local reply.'), findsOneWidget);
+    expect(speech.spoken, isEmpty);
+  });
+
+  testWidgets('hands-free listens, replies aloud, and stops after silence', (
+    tester,
+  ) async {
+    final backend = _FakeGemmaChatBackend(installed: true);
+    final speech = _FakeSpeech(heard: ['Tulong, tumataas ang tubig']);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: GemmaChatScreen(backend: backend, speech: speech),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('hands-free-button')));
+    await tester.pumpAndSettle();
+
+    expect(backend.sentPrompts, ['Tulong, tumataas ang tubig']);
+    expect(speech.spoken, ['A sample local reply.']);
+    // One spoken turn, then two silent listens end the session.
+    expect(speech.listenCalls, 3);
+    expect(
+      tester
+          .widget<IconButton>(find.byKey(const Key('hands-free-button')))
+          .isSelected,
+      isFalse,
+    );
+  });
+
+  testWidgets('hides voice controls when no speech backend is given', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: GemmaChatScreen(backend: _FakeGemmaChatBackend(installed: true)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('mic-button')), findsNothing);
+    expect(find.byKey(const Key('hands-free-button')), findsNothing);
+  });
+}
+
+class _FakeSpeech implements SpeechTestBackend {
+  _FakeSpeech({required this.heard});
+
+  final List<String> heard;
+  final List<String> spoken = [];
+  int listenCalls = 0;
+
+  @override
+  Future<String> listen({
+    Duration maxDuration = const Duration(seconds: 28),
+    Duration silenceAfterSpeech = const Duration(milliseconds: 1500),
+    Duration waitForSpeech = const Duration(seconds: 8),
+  }) async {
+    listenCalls++;
+    return heard.isEmpty ? '' : heard.removeAt(0);
+  }
+
+  @override
+  Future<void> cancelListening() async {}
+
+  @override
+  Future<void> speak(String text) async => spoken.add(text);
+
+  @override
+  Future<void> stopSpeaking() async {}
+
+  @override
+  Future<bool> isWhisperInstalled() async => true;
+
+  @override
+  Future<void> installWhisper({required void Function(int) onProgress}) async {}
+
+  @override
+  Future<FilipinoTtsVoiceStatus> checkFilipinoVoice() async =>
+      const FilipinoTtsVoiceStatus(
+        voiceFound: true,
+        installed: true,
+        networkRequired: false,
+        voiceName: 'fil',
+        locale: 'fil-PH',
+      );
+
+  @override
+  Future<void> dispose() async {}
 }
 
 class _FakeGemmaChatBackend implements GemmaChatBackend {
@@ -251,7 +359,6 @@ class _FakeKnowledgeBase implements LocalKnowledgeBase {
 
   @override
   Future<void> installAndIndex({
-    required String accessToken,
     required void Function(KnowledgeBaseProgress progress) onProgress,
   }) async {}
 

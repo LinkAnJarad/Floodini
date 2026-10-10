@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:walang_signal/features/knowledge/domain/rag_prompt_builder.dart';
-import 'package:walang_signal/features/knowledge/domain/retrieved_passage.dart';
+import 'package:floodini/features/knowledge/domain/rag_prompt_builder.dart';
+import 'package:floodini/features/knowledge/domain/retrieved_passage.dart';
 
 void main() {
   test(

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.walang_signal"
+    namespace = "com.floodini.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -15,8 +15,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.walang_signal"
+        applicationId = "com.floodini.app"
         // You can update the following values to match your application needs.
         minSdk = 30
         ndk {
@@ -44,6 +43,11 @@ kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
+}
+
+dependencies {
+    // Background retries for the "Send later" SMS queue.
+    implementation("androidx.work:work-runtime:2.10.0")
 }
 
 flutter {

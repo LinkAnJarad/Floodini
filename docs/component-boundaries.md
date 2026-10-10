@@ -20,7 +20,7 @@ Rules for new components:
 2. Put package-specific or platform-specific code in `features/<feature>/data/` and implement the domain interface there.
 3. Inject the interface into the presentation widget's constructor. Do not import a platform plugin or concrete data adapter into a presentation screen.
 4. Test the screen against a fake implementation of the domain interface. Keep real permission, microphone, GPS, model, and file integration as a separate device smoke test.
-5. Add a feature tab only in `app/home_tabs.dart`; keep app-wide plugin initialization and concrete adapter construction in `main.dart` / `app/walang_signal_app.dart`.
+5. Add a feature tab only in `app/home_tabs.dart`; keep app-wide plugin initialization and concrete adapter construction in `main.dart` / `app/floodini_app.dart`.
 6. Keep data provenance, permission/error states, and offline behavior visible in the domain result or UI; never hide those policies inside a widget.
 
 ## Current component seams
@@ -28,12 +28,12 @@ Rules for new components:
 | Feature | Domain contract | Data adapter | Presentation | Test |
 |---|---|---|---|---|
 | Chat + images | `GemmaChatBackend`, `ChatImagePicker` | LiteRT-LM and image picker | `GemmaChatScreen` | `test/features/chat/gemma_chat_screen_test.dart` |
-| Filipino speech test | `SpeechTestBackend`, `FilipinoTtsVoiceStatus` | Whisper, recorder, Android TTS | `SpeechTestScreen` | `test/features/speech/speech_test_screen_test.dart` |
-| App composition | `WalangSignalHome` receives feature backends | Constructed in `main.dart` | `app/home_tabs.dart` | `test/app/home_tabs_test.dart` |
+| Filipino voice (in Chat) | `SpeechTestBackend`, `FilipinoTtsVoiceStatus` | Whisper, recorder, Android TTS | `GemmaChatScreen` (mic and hands-free) | `test/features/chat/gemma_chat_screen_test.dart` |
+| App composition | `FloodiniHome` receives feature backends | Constructed in `main.dart` | `app/home_tabs.dart` | `test/app/home_tabs_test.dart` |
 
 ## GPS / nearby aid extension point
 
-Add a `features/locations/` slice rather than putting GPS logic in `WalangSignalHome`:
+Add a `features/locations/` slice rather than putting GPS logic in `FloodiniHome`:
 
 - `domain/location_provider.dart`: permission state and a location fix (coordinates, accuracy, timestamp).
 - `domain/aid_facility_repository.dart`: query nearby facilities from a local/offline source.

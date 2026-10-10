@@ -14,7 +14,9 @@ class RagPromptBuilder {
     );
     for (var index = 0; index < passages.length; index++) {
       final passage = passages[index];
-      buffer.write('[${index + 1}] ${passage.title} — ${passage.sectionPath}\n');
+      buffer.write(
+        '[${index + 1}] ${passage.title} — ${passage.sectionPath}\n',
+      );
       if (passage.publisher != null) {
         buffer.write('Publisher: ${passage.publisher}\n');
       }

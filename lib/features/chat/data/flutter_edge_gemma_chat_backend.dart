@@ -24,9 +24,12 @@ class FlutterEdgeGemmaChatBackend implements GemmaChatBackend {
   @override
   Future<void> installModel({required void Function(int progress) onProgress}) {
     return FlutterEdgeAi.installModel(
-      modelType: ModelType.gemma4,
-      fileType: ModelFileType.litertlm,
-    ).fromNetwork(modelUrl).withProgress(onProgress).install();
+          modelType: ModelType.gemma4,
+          fileType: ModelFileType.litertlm,
+        )
+        .fromNetwork(modelUrl, foreground: true)
+        .withProgress(onProgress)
+        .install();
   }
 
   @override
@@ -51,7 +54,9 @@ class FlutterEdgeGemmaChatBackend implements GemmaChatBackend {
           'specific guidance in them and cite their bracketed source numbers. '
           'If no relevant passage is supplied, say the local library has no '
           'matching verified guidance; do not invent detailed medical advice. '
-          'This demo is not an official emergency service. Answer concisely.',
+          'This demo is not an official emergency service. Answer concisely, in '
+          'the same language the user writes or speaks (English, Filipino, or '
+          'Taglish).',
     );
   }
 

@@ -13,7 +13,6 @@ abstract interface class LocalKnowledgeBase {
   Future<bool> restoreIfAvailable();
 
   Future<void> installAndIndex({
-    required String accessToken,
     required void Function(KnowledgeBaseProgress progress) onProgress,
   });
 

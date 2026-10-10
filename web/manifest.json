@@ -1,6 +1,6 @@
 {
-    "name": "walang_signal",
-    "short_name": "walang_signal",
+    "name": "floodini",
+    "short_name": "floodini",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
